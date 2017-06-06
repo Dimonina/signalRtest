@@ -3,3 +3,7 @@
 ################################################################################
 
 /.vs
+/packages
+/SignalRwebsite/bin
+/SignalRwebsite/obj/Debug
+*.user
