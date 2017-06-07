@@ -19,7 +19,7 @@
                 <option>client</option>
                 <option>approver</option>
             </select>
-            <input type="number" v-model="chatId" placeholder="Chat Id" />
+            <input type="number" v-model="chatId" placeholder="Chat Id" v-if="type == 'client'" />
             <input v-model="username" placeholder="username">
             <button v-on:click="startReceiving">Start</button>
         </div>
@@ -27,14 +27,15 @@
             Name: {{ username }}, Role: {{ type }},
             ChatId: {{ chatId }}
         </div>
-        <div v-if="isStarted">
+        <div v-if="isStarted && type == 'client'">
             Send message: <br />
             <input v-model="message" placeholder="Message">
             <button v-on:click="sendMessage">Send</button>
         </div>
         <div v-if="isStarted">
-            <div v-for="msg in messages">
-                {{ msg.username }}: {{ msg.message }}
+            <div v-for="msg in messages" style="margin: 4px;">
+                {{ msg.Name }}: {{ msg.Message }}
+                <button v-if="type == 'approver'" v-on:click="approveMessage(msg)">Approve</button>
             </div>
         </div>
     </div>

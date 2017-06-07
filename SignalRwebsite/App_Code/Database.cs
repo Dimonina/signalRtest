@@ -16,11 +16,16 @@ namespace SignalRwebsite.App_Code
 
     public class Database
     {
-        public Database()
+        public List<Entry> Entries
         {
-            this.Entries = new List<Entry>();
+            get
+            {
+                if (HttpContext.Current.Application["db"] == null)
+                {
+                    HttpContext.Current.Application["db"] = new List<Entry>();
+                }
+                return (List<Entry>) HttpContext.Current.Application["db"];
+            }
         }
-
-        public List<Entry> Entries { get; set; }
     }
 }

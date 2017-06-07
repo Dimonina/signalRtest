@@ -11,9 +11,22 @@ namespace SignalRwebsite.App_Code
     {
         private readonly Database _db = new Database();
 
-        public void MessageReceived(Entry entry)
+        public void GetChat(string chatId)
         {
-            Clients.Group(entry.ChatId).messageReceived(entry.Name, entry.Message);
+            var q = _db.Entries.AsQueryable();
+            if (chatId == "-100")
+            {
+                q = q.Where(x => x.IsApproved == false);
+            }
+            else
+            {
+                q = q.Where(x => x.ChatId == chatId && x.IsApproved);
+            }
+            var clientMessages = _db.Entries.Where(x => x.ChatId == chatId && x.IsApproved).ToArray();
+            var approverMessages = _db.Entries.Where(x => x.IsApproved == false).ToArray();
+
+            Clients.Group(chatId).getChat(clientMessages);
+            Clients.Group("-100").getChat(approverMessages);
         }
 
         public void SendMessage(string chatId, string name, string message)
@@ -26,12 +39,19 @@ namespace SignalRwebsite.App_Code
                 MessageId = Guid.NewGuid()
             };
             _db.Entries.Add(entry);
-            MessageReceived(entry);
+            GetChat(chatId);
         }
 
         public void JoinChat(string chatId)
         {
             this.Groups.Add(Context.ConnectionId, chatId);
+        }
+
+        public void ApproveMessage(Entry message)
+        {
+            _db.Entries.Where(x => x.MessageId == message.MessageId).ToList().ForEach(x => x.IsApproved = true);
+            GetChat(message.ChatId);
+
         }
     }
 }
